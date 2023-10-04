@@ -4,6 +4,8 @@
 #include <SparkFun_I2C_Mux_Arduino_Library.h>  //Click here to get the library: http://librarymanager/All#SparkFun_I2C_Mux
 #include <MIDIUSB.h>
 
+#pragma GCC optimize("-O0")
+
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 #define AT __FILE__ ":" TOSTRING(__LINE__)
@@ -20,6 +22,55 @@ PCF8574 PCF[8] = {
   PCF8574(0x26, &Wire),
   PCF8574(0x27, &Wire)
 };
+
+void scanTabs(void) {
+  // scan the mux's ports for PCF8574s
+  for (int m = 0; m <= 7; m++) {
+    myMux.setPort(m);  //Connect master to port m on the mux
+    Serial.print("M:");
+    Serial.print(m);
+    Serial.print("-> ");
+
+    for (int n = 0; n <= 7; n++) {
+      Serial.print(n);
+      Serial.print(":");
+      if (!PCF[n].isConnected()) {
+        Serial.print((".. "));
+      } else {
+        int x = PCF[n].read8();
+        if (x < 16) Serial.print("0");
+        Serial.print(x, HEX);
+        Serial.print(" ");
+      }
+    }  // for n
+    Serial.println("");
+  }  // for m
+}
+
+
+void scanTabsPrintCode(void) {
+  // scan the mux's ports for PCF8574s
+  for (int m = 0; m <= 7; m++) {
+    myMux.setPort(m);  //Connect master to port m on the mux
+
+    for (int n = 0; n <= 7; n++) {
+      if (PCF[n].isConnected()) {
+        int x = PCF[n].read8();
+        for (int i=0;i<8;i++){
+          if (x&(1<<i))
+          {
+            int code=((m&7)<<6)|((n&7)<<3)|(i&7);
+            Serial.print("0X");
+            Serial.print(code,HEX);
+            Serial.print(" ");
+          }
+        }
+      }
+    }  // for n
+  }  // for m
+}
+
+
 
 void setupTabStopReader() {
   // put your setup code here, to run once:
@@ -39,43 +90,15 @@ void setupTabStopReader() {
   // scan the mux's ports for PCF8574s
   for (int m = 0; m <= 7; m++) {
     myMux.setPort(m);  //Connect master to port m on the mux
-    Serial.print("M:");
-    Serial.print(m);
-    Serial.print("-> ");
-
     for (int n = 0; n <= 7; n++) {
-      Serial.print(n);
-      Serial.print(":");
       PCF[n].begin(0xff);   // from the data sheet: The I/Os should be high before being used as inputs.
       PCF[n].write8(0xff);  // drive it back to 0v so that the cap can discharge in the protection circuit
-      if (!PCF[n].isConnected()) {
-        Serial.print((".. "));
-      } else {
-        int x = PCF[n].read8();
-        if (x < 16) Serial.print("0");
-        Serial.print(x, HEX);
-        Serial.print(" ");
-      }
-    }  // for n
+    }                       // for n
     Serial.println("");
   }  // for m
-
-  // do {
-  //   for (uint8_t i = 0; i < 8; i++) {
-  //     int readPCF8574(uint8_t mux, uint8_t address);
-  //     int x = readPCF8574(7, i);
-  //     if (x >= 0) {
-  //       Serial.print(" ");
-  //       Serial.print(i);
-  //       Serial.print(":0x");
-  //       if (x < 16) Serial.print("0");
-  //       Serial.print(x, HEX);
-  //     }
-  //   }
-  //   Serial.println("");
-  //   delay(1000);
-  // } while (1);
+  scanTabs();
 }
+
 
 int readPCF8574(uint8_t mux, uint8_t address) {
   if (mux > 7) {
@@ -112,11 +135,12 @@ int readPCF8574(uint8_t mux, uint8_t address) {
   }
   return x;
 }
+
 int isTabSet(int tabAddress)  // bits 8,7,6 mux, bits 5,4,3 are the chip, bits 2,1,0 are the bit
 {
   int mux = (tabAddress >> 6) & 0x07;
   //Serial.print ("Mux="); Serial.println(mux);
-  int chip = (tabAddress>>3) & 0x07;
+  int chip = (tabAddress >> 3) & 0x07;
   //Serial.print ("Chip="); Serial.println(chip);
   int x = readPCF8574(mux, chip);
   int bit = tabAddress & 0x07;
