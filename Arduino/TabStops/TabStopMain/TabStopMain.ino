@@ -34,10 +34,17 @@ void loop() {
   for (int i = 0;stops[i].I2C_BIT!=-1 && stops[i].SPIaddress!=-1; i++) {
     // int i=1; {
     TabStopOptimalOn(i);
-    delay(1050);
-    TabStopOptimalOff(i);
-    delay(1050);
   }
+    delay(1050);
+
+  for (int i = 0;stops[i].I2C_BIT!=-1 && stops[i].SPIaddress!=-1; i++) {
+    // int i=1; {
+    TabStopOptimalOff(i);
+  }
+
+    delay(1050);
+
+
 }
 
     // int mux = 7;
