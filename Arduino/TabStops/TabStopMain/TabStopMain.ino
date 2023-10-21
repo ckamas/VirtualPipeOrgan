@@ -25,12 +25,14 @@ void loop() {
   for (;;) {
     if (millis() - timeout >= 25) {
       timeout = millis();
-      MyEngine.tabOn(drive);
+      // MyEngine.tabOn(drive);
       drive++;
       if (stops[drive].I2C_BIT == -1 && stops[drive].SPIaddress == -1) {
         drive = 0;
       }
-      MyEngine.tabOff(drive);
+      // MyEngine.tabOff(drive);
+      scanTabsPrintCode();
+      Serial.println(".");
     }
     MyEngine.loop();
   }
