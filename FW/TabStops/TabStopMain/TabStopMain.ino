@@ -23,16 +23,16 @@ void loop() {
   unsigned long timeout = millis();
 
   for (;;) {
-    if (millis() - timeout >= 25) {
+    if (millis() - timeout >= 250) {
       timeout = millis();
-      // MyEngine.tabOn(drive);
+      MyEngine.tabOn(drive);
       drive++;
       if (stops[drive].I2C_BIT == -1 && stops[drive].SPIaddress == -1) {
         drive = 0;
       }
-      // MyEngine.tabOff(drive);
-      scanTabsPrintCode();
-      Serial.println(".");
+      MyEngine.tabOff(drive);
+      // scanTabsPrintCode();
+      // Serial.println(".");
     }
     MyEngine.loop();
   }

@@ -1,3 +1,11 @@
 /Arduino/old/*
 /July2022-ordered-PCB/eagle-9.6.2/*
 /June2021-PCB/eagle-9.6.2/*
+/FW/TabStops/TabStopMain/.vscode/.cortex-debug.registers.state.json
+/FW/TabStops/TabStopMain/.theia/launch.json
+*/eagle-9.6.2/*
+.*/eagle-9.6.2/.*
+/HW/July2022-ordered-PCB/eagle-9.6.2/README
+/HW/July2022-ordered-PCB/eagle-9.6.2/*
+/HW/June2021-PCB/eagle-9.6.2/*
+/FW/old/undefined/*
