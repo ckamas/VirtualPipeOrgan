@@ -131,7 +131,7 @@ void readManual(int manual, uint64_t *keys) {
 // control 0-128
 // value 0-128
 void sendMidiAnalog(uint8_t channel, uint8_t control, uint8_t value) {
-  midiEventPacket_t event = { 0x0B, 0xB0 | channel, control, value };
+  midiEventPacket_t event = { 0x0B, (uint8_t)(0xB0 | channel), control, value };
   MidiUSB.sendMIDI(event);
   MidiUSB.flush();
 }
@@ -140,13 +140,13 @@ void sendMidiAnalog(uint8_t channel, uint8_t control, uint8_t value) {
 // note 0-128
 // noteOnOff, 0= note off, 1=note on
 void sendMidiNoteOn(uint8_t channel, uint8_t note) {
-  midiEventPacket_t noteOn = { 0x09, 0x90 | channel, note, 0x40 };
+  midiEventPacket_t noteOn = { 0x09, (uint8_t)(0x90 | channel), note, 0x40 };
   MidiUSB.sendMIDI(noteOn);
   MidiUSB.flush();
 }
 
 void sendMidiNoteOff(uint8_t channel, uint8_t note) {
-  midiEventPacket_t noteOff = { 0x09, 0x80 | channel, note, 0x00 };
+  midiEventPacket_t noteOff = { 0x09, (uint8_t)(0x80 | channel), note, 0x00 };
   MidiUSB.sendMIDI(noteOff);
   MidiUSB.flush();
 }
@@ -160,8 +160,8 @@ void sendMidiNoteOff(uint8_t channel, uint8_t note) {
 // }
 
 void UpadateKeyState(struct keyState *keysState, uint64_t keys, int length, int midiChannel) {
-  //  Serial.println(TOSTRING(__LINE__));
-  //  dumpKeyState(keysState);
+    // Serial.println(TOSTRING(__LINE__));
+    // dumpKeyState(keysState);
   for (int i = 0; i < length; i++) {
     int state = 0;
 
@@ -173,7 +173,7 @@ void UpadateKeyState(struct keyState *keysState, uint64_t keys, int length, int 
       {
         keysState[i].oldState = DOWN;
         sendMidiNoteOn(midiChannel, keysState[i].midiKey);  // turn on note
-                                                            //        Serial.print ("ON. i="); Serial.print (i); Serial.print (" midiChannel="); Serial.print (midiChannel); Serial.print (" key#="); Serial.print ( keysState[i].midiKey); Serial.println();
+                                                                    Serial.print ("ON. i="); Serial.print (i); Serial.print (" midiChannel="); Serial.print (midiChannel); Serial.print (" key#="); Serial.print ( keysState[i].midiKey); Serial.println();
                                                             //        Serial.print(TOSTRING(__LINE__));
                                                             //        dumpKeyState(keysState);
       }
@@ -182,7 +182,7 @@ void UpadateKeyState(struct keyState *keysState, uint64_t keys, int length, int 
       {
         keysState[i].oldState = UP;
         sendMidiNoteOff(midiChannel, keysState[i].midiKey);  // turn off note
-                                                             //        Serial.print ("OFF i="); Serial.print (i); Serial.print (" midiChannel="); Serial.print (midiChannel); Serial.print (" key#="); Serial.print ( keysState[i].midiKey); Serial.println();
+                                                                     Serial.print ("OFF i="); Serial.print (i); Serial.print (" midiChannel="); Serial.print (midiChannel); Serial.print (" key#="); Serial.print ( keysState[i].midiKey); Serial.println();
                                                              //        Serial.print(TOSTRING(__LINE__));
                                                              //        dumpKeyState(keysState);
       }
@@ -197,12 +197,12 @@ void loop() {
   // put your main code here, to run repeatedly:
 
 #if 0
-  USBMIDI.poll();
+  // MidiUSB.poll();
 
-  while (USBMIDI.available()) {
+  while (MidiUSB.available()) {
     // We must read entire available data, so in case we receive incoming
     // MIDI data, the host wouldn't get stuck.
-    u8 b = USBMIDI.read();
+    MidiUSB.read(); // we don't care about incoming midi, so just drop it!
   }
 #endif
 
