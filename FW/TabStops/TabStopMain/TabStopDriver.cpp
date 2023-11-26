@@ -28,7 +28,7 @@ const int TABA = 0;
 const int TABB = 1;
 
 
-void TabSetOn(int index) {
+void TabSetOff(int index) {
   int tab = stops[index].SPIaddress;
   int i = tab * 2;
 
@@ -37,7 +37,7 @@ void TabSetOn(int index) {
   DriveOn(TABA + i);
 }
 
-void TabSetOff(int index) {
+void TabSetOn(int index) {
   int tab = stops[index].SPIaddress;
   int i = tab * 2;
 

@@ -4,6 +4,8 @@
 #include "TabStopReader.h"
 #include "TabStopDriver.h"
 
+#pragma GCC optimize("-O0")
+
 
 // TabStopsEngine all drivers off, leave in their current position.
 TabStopsEngine::~TabStopsEngine() {
@@ -37,7 +39,8 @@ void TabStopsEngine::loop() {
       case start_on:
         // Serial.print("Turing tab");
         // Serial.print(i);
-        // Serial.println(" on");
+        // Serial.print(" on ");
+        // Serial.println (stops[i].TabStop);
 
         TabSetOn(i);
         stops[i].timestamp = millis();
@@ -48,6 +51,7 @@ void TabStopsEngine::loop() {
         // Serial.print("Turing tab");
         // Serial.print(i);
         // Serial.println(" off");
+        // Serial.println (stops[i].TabStop);
 
         TabSetOff(i);
         stops[i].timestamp = millis();
@@ -56,7 +60,7 @@ void TabStopsEngine::loop() {
 
       case wait_on:
         if (millis() - stops[i].timestamp >= DRIVETIME) {
-          // Serial.print("done driving tab");
+          // Serial.print("done driving tab on");
           // Serial.print(i);
           // Serial.println(" on");
 
@@ -67,7 +71,7 @@ void TabStopsEngine::loop() {
 
       case wait_off:
         if (millis() - stops[i].timestamp >= DRIVETIME) {
-          // Serial.print("done driving tab");
+          // Serial.print("done driving tab off");
           // Serial.print(i);
           // Serial.println(" off");
 
@@ -81,18 +85,22 @@ void TabStopsEngine::loop() {
 
 // command  TAB on or off
 void TabStopsEngine::tabOn(int tab) {
-  // if (isTabSet(stops[tab].I2C_BIT) != TABON) {
+  if (tab < stopsSize) {
+    // if (isTabSet(stops[tab].I2C_BIT) != TABON) {
     // Tab needs to be moved
     stops[tab].MyState = start_on;
-  // } else {
-  //   // Serial.println("Tab DOES NOT need to be moved on");
-  // }
+    // } else {
+    //   // Serial.println("Tab DOES NOT need to be moved on");
+    // }
+  }
 }
 void TabStopsEngine::tabOff(int tab) {
-  // if (isTabSet(stops[tab].I2C_BIT) != TABOFF) {
+  if (tab < stopsSize) {
+    // if (isTabSet(stops[tab].I2C_BIT) != TABOFF) {
     // Tab needs to be moved
     stops[tab].MyState = start_off;
-  // } else {
-  //   // Serial.println("Tab DOES NOT need to be moved off");
-  // }
+    // } else {
+    //   // Serial.println("Tab DOES NOT need to be moved off");
+    // }
+  }
 }

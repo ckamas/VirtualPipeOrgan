@@ -74,7 +74,6 @@ void scanTabsPrintCode(void) {
 
 void setupTabStopReader() {
   // put your setup code here, to run once:
-  Wire.begin();
 
   //  Serial.println(__FILE__);
   //  Serial.print("PCF8574_LIB_VERSION:\t");
