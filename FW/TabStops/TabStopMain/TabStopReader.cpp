@@ -25,7 +25,7 @@ PCF8574 PCF[8] = {
 
 void scanTabs(void) {
   // scan the mux's ports for PCF8574s
-  for (int m = 0; m <= 7; m++) {
+  for (int m = 6; m <= 7; m++) {
     myMux.setPort(m);  //Connect master to port m on the mux
     Serial.print("M:");
     Serial.print(m);
@@ -80,7 +80,7 @@ void setupTabStopReader() {
   //  Serial.println(PCF8574_LIB_VERSION);
 
   if (myMux.begin() == false) {
-    Serial.println("Mux not detecte");
+    Serial.println("Mux not detected");
     //while (1);
   }
   //  Serial.println("Mux detected");
@@ -93,9 +93,9 @@ void setupTabStopReader() {
       PCF[n].begin(0xff);   // from the data sheet: The I/Os should be high before being used as inputs.
       PCF[n].write8(0xff);  // drive it back to 0v so that the cap can discharge in the protection circuit
     }                       // for n
-    Serial.println("");
+    // Serial.println("");
   }  // for m
-  scanTabs();
+  // scanTabs();
 }
 
 

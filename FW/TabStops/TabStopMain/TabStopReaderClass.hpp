@@ -21,6 +21,7 @@ private:
   void MidiSendTabOff(uint8_t tab);
   void MidiSendTabOn(uint8_t tab);
 
+  void TabStopsReadingEngineDebug();
 
 
   typedef struct {

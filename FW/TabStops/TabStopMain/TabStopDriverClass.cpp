@@ -43,7 +43,7 @@ void TabStopsEngine::loop() {
         // Serial.println (stops[i].TabStop);
 
         TabSetOn(i);
-        stops[i].timestamp = millis();
+        stops[i].DriveTimeStamp = millis();
         stops[i].MyState = wait_on;
         break;
 
@@ -54,12 +54,12 @@ void TabStopsEngine::loop() {
         // Serial.println (stops[i].TabStop);
 
         TabSetOff(i);
-        stops[i].timestamp = millis();
+        stops[i].DriveTimeStamp = millis();
         stops[i].MyState = wait_off;
         break;
 
       case wait_on:
-        if (millis() - stops[i].timestamp >= DRIVETIME) {
+        if (millis() - stops[i].DriveTimeStamp >= DRIVETIME) {
           // Serial.print("done driving tab on");
           // Serial.print(i);
           // Serial.println(" on");
@@ -70,7 +70,7 @@ void TabStopsEngine::loop() {
         break;
 
       case wait_off:
-        if (millis() - stops[i].timestamp >= DRIVETIME) {
+        if (millis() - stops[i].DriveTimeStamp >= DRIVETIME) {
           // Serial.print("done driving tab off");
           // Serial.print(i);
           // Serial.println(" off");

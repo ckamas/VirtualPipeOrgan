@@ -8,12 +8,17 @@ enum State {
 };
 
 typedef struct {
-  const int SPIaddress;
-  const int I2C_BIT;
-  bool tabReadSet;
-  unsigned long timestamp;
-  State MyState;
-  const char *TabStop;
+  // for the tab stop solenoids
+  const int SPIaddress;           // for driving the tabstop to a particular state
+  State MyState;                  // driving state
+  unsigned long DriveTimeStamp;   // how long to leave the solenoid energized
+  
+  // for reading the state of the tabstops
+  const int I2C_BIT;              // for reading the tapstop's current state.
+  bool tabReadSet;                // current state driven out on midi
+  unsigned long ReadTimeStamp;    // when to start reading the i2c again
+
+  const char *TabStop;            // human readable name
 } TabStops;
 
 extern TabStops stops[];
