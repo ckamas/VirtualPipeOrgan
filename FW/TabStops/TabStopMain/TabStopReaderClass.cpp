@@ -1,3 +1,5 @@
+#include "api/Common.h"
+#include "api/Printable.h"
 #include "variant.h"
 #include <Arduino.h>
 #include <MIDIUSB.h>
@@ -24,9 +26,9 @@ void TabStopsReadingEngine::MidiSendTabOn(uint8_t tab) {
   MidiUSB.sendMIDI(noteOn);
   MidiUSB.flush();
 
-  Serial.print("MIDI Setting tab ");
-  Serial.print(tab);
-  Serial.println(" to on");
+  // Serial.print("MIDI Setting tab ");
+  // Serial.print(tab);
+  // Serial.println(" to on");
 }
 
 void TabStopsReadingEngine::MidiSendTabOff(uint8_t tab) {
@@ -44,9 +46,9 @@ void TabStopsReadingEngine::MidiSendTabOff(uint8_t tab) {
   MidiUSB.sendMIDI(noteOff);
   MidiUSB.flush();
 
-  Serial.print("MIDI Setting tab ");
-  Serial.print(tab);
-  Serial.println(" to off");
+  // Serial.print("MIDI Setting tab ");
+  // Serial.print(tab);
+  // Serial.println(" to off");
 }
 
 
@@ -110,6 +112,12 @@ void TabStopsReadingEngine::loop() {
     // now check the time out for timeded outed
     if (stops[stops_i].ReadTimeStamp != 0) {
       if (millis() - stops[stops_i].ReadTimeStamp >= DEBOUNCE) {
+        // Serial.print("Debounced tab ");
+        // Serial.print(stops_i);
+        // Serial.print(" ");
+        // Serial.print(stops[stops_i].ReadTimeStamp);
+        // Serial.print(" ");
+        // Serial.println(millis());
         stops[stops_i].ReadTimeStamp = 0;
       }
     }

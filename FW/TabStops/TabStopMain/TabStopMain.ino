@@ -86,6 +86,8 @@ void setup() {
   // Serial.println(stopsSize, DEC);
 
   MyTabReader.init();
+
+  light(PowerLight, on);
 }
 
 

@@ -24,6 +24,14 @@ static void DriveOff(unsigned int bit) {
   return my595.setBitOff((board << 3) + (7 - pin));
 }
 
+void light(unsigned int light, bool state) {
+  if (state) {
+    return my595.setBitOn(light);
+  } else {
+    return my595.setBitOff(light);
+  }
+}
+
 const int TABA = 0;
 const int TABB = 1;
 
