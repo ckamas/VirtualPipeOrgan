@@ -16,6 +16,7 @@ const int CHOIR = 7;
 const int GREAT = 6;
 const int SWELL = 5;
 const int PEDAL = 4;
+const int PISTON = 3;
 
 const int CHOIRMIDICHANNEL = 1;
 const int GREATMIDICHANNEL = 2;
@@ -41,7 +42,7 @@ const int lowestPedalNoteMIDI = 12;  // I think 24 is CC not CCC... might need t
 struct keyState choirKeys[numManualKeys];
 struct keyState greatKeys[numManualKeys];
 struct keyState swellKeys[numManualKeys];
-struct keyState pedalKeys[numPedalKeys];
+struct keyState pedalKeys[numManualKeys];
 
 
 
@@ -72,12 +73,14 @@ void setup() {
   pinMode(GREAT, OUTPUT);
   pinMode(SWELL, OUTPUT);
   pinMode(PEDAL, OUTPUT);
+  pinMode(PISTON,OUTPUT);
   //  Serial.println(TOSTRING(__LINE__));
 
   digitalWrite(CHOIR, HIGH);
   digitalWrite(GREAT, HIGH);
   digitalWrite(SWELL, HIGH);
   digitalWrite(PEDAL, HIGH);
+  digitalWrite(PISTON, HIGH);
   //  Serial.println(TOSTRING(__LINE__));
 
   A.init();
@@ -100,7 +103,7 @@ void setup() {
   initKeyState(choirKeys, numManualKeys, lowestManualNoteMIDI);
   initKeyState(greatKeys, numManualKeys, lowestManualNoteMIDI);
   initKeyState(swellKeys, numManualKeys, lowestManualNoteMIDI);
-  initKeyState(pedalKeys, numPedalKeys, lowestPedalNoteMIDI);
+  initKeyState(pedalKeys, numManualKeys, lowestPedalNoteMIDI);
   //  Serial.println(TOSTRING(__LINE__));
 }
 
@@ -221,8 +224,8 @@ void loop() {
   readManual(SWELL, &keys);
   UpadateKeyState(swellKeys, keys, numManualKeys, SWELLMIDICHANNEL);
 
-  readManual(PEDAL, &keys);
-  UpadateKeyState(pedalKeys, keys, numPedalKeys, PEDALMIDICHANNEL);
+  readManual(PEDAL | PISTON, &keys);
+  UpadateKeyState(pedalKeys, keys, numManualKeys, PEDALMIDICHANNEL);
 
   //  delay(1000);                       // wait for a second
 }
