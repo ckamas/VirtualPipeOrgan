@@ -12,11 +12,11 @@ MCP23017 B = MCP23017(0x25);
 MCP23017 C = MCP23017(0x26);
 MCP23017 D = MCP23017(0x27);
 
+const int PISTON = 10;
 const int CHOIR = 7;
 const int GREAT = 6;
 const int SWELL = 5;
 const int PEDAL = 4;
-const int PISTON = 3;
 
 const int CHOIRMIDICHANNEL = 1;
 const int GREATMIDICHANNEL = 2;
@@ -62,7 +62,7 @@ void setup() {
   Wire.setClock(400000L);
   Serial.begin(115200);
   while (!Serial) {};
-  Serial.println("Hello World");
+  // Serial.println("Hello World");
 
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
@@ -73,7 +73,7 @@ void setup() {
   pinMode(GREAT, OUTPUT);
   pinMode(SWELL, OUTPUT);
   pinMode(PEDAL, OUTPUT);
-  pinMode(PISTON,OUTPUT);
+  pinMode(PISTON, OUTPUT);
   //  Serial.println(TOSTRING(__LINE__));
 
   digitalWrite(CHOIR, HIGH);
@@ -81,6 +81,7 @@ void setup() {
   digitalWrite(SWELL, HIGH);
   digitalWrite(PEDAL, HIGH);
   digitalWrite(PISTON, HIGH);
+
   //  Serial.println(TOSTRING(__LINE__));
 
   A.init();
@@ -111,14 +112,14 @@ void setup() {
 /////////////////////////////////////////////////
 ///////////Helper funcitons ////////////////////
 ////////////////////////////////////////////////
-void readManual(int manual, uint64_t *keys) {
+void readManual(int manual, uint16_t keys[4]) {
   digitalWrite(manual, LOW);
   //delayMicroseconds(50);  // wait Xus
 
-  *keys = A.read();
-  *keys = *keys << 16 | B.read();
-  *keys = *keys << 16 | C.read();
-  *keys = *keys << 16 | D.read();
+  keys[0] = A.read();
+  keys[1] = B.read();
+  keys[2] = C.read();
+  keys[3] = D.read();
 
   digitalWrite(manual, HIGH);
 }
@@ -162,13 +163,19 @@ void sendMidiNoteOff(uint8_t channel, uint8_t note) {
 //  Serial.println("\tmidiKey="); Serial.println(keysState[0].midiKey);
 // }
 
-void UpadateKeyState(struct keyState *keysState, uint64_t keys, int length, int midiChannel) {
-    // Serial.println(TOSTRING(__LINE__));
-    // dumpKeyState(keysState);
+void UpadateKeyState(struct keyState *keysState, uint16_t keys[4], int length, int midiChannel) {
+  // Serial.println(TOSTRING(__LINE__));
+  // dumpKeyState(keysState);
   for (int i = 0; i < length; i++) {
     int state = 0;
+    int index=i/16;
+    int shift=i%16;
 
-    state = (keys >> (uint64_t)i) & 0x01;
+    state = (keys[index] >> shift) & 0x01;
+    // Serial.print ("i="); Serial.print(i);
+    // Serial.print (" shift="); Serial.print(shift);
+    // Serial.print (" index="); Serial.print(index);
+    // Serial.println();
 
     if (state)  // key is pressed
     {
@@ -176,20 +183,33 @@ void UpadateKeyState(struct keyState *keysState, uint64_t keys, int length, int 
       {
         keysState[i].oldState = DOWN;
         sendMidiNoteOn(midiChannel, keysState[i].midiKey);  // turn on note
-                                                                    Serial.print ("ON. i="); Serial.print (i); Serial.print (" midiChannel="); Serial.print (midiChannel); Serial.print (" key#="); Serial.print ( keysState[i].midiKey); Serial.println();
-                                                            //        Serial.print(TOSTRING(__LINE__));
-                                                            //        dumpKeyState(keysState);
+        // Serial.print("ON. i=");
+        // Serial.print(i);
+        // Serial.print(" midiChannel=");
+        // Serial.print(midiChannel);
+        // Serial.print(" key#=");
+        // Serial.print(keysState[i].midiKey);
+        // Serial.println();
+        //        Serial.print(TOSTRING(__LINE__));
+        //        dumpKeyState(keysState);
       }
     } else {
       if (DOWN == keysState[i].oldState)  // old was downn, now up
       {
         keysState[i].oldState = UP;
         sendMidiNoteOff(midiChannel, keysState[i].midiKey);  // turn off note
-                                                                     Serial.print ("OFF i="); Serial.print (i); Serial.print (" midiChannel="); Serial.print (midiChannel); Serial.print (" key#="); Serial.print ( keysState[i].midiKey); Serial.println();
-                                                             //        Serial.print(TOSTRING(__LINE__));
-                                                             //        dumpKeyState(keysState);
+        // Serial.print("OFF i=");
+        // Serial.print(i);
+        // Serial.print(" midiChannel=");
+        // Serial.print(midiChannel);
+        // Serial.print(" key#=");
+        // Serial.print(keysState[i].midiKey);
+        // Serial.println();
+        //        Serial.print(TOSTRING(__LINE__));
+        //        dumpKeyState(keysState);
       }
     }
+    index++;
   }
 }
 
@@ -197,7 +217,16 @@ void UpadateKeyState(struct keyState *keysState, uint64_t keys, int length, int 
 ///////////// main loop ///////////////////////////////
 ///////////////////////////////////////////////////////
 void loop() {
-  // put your main code here, to run repeatedly:
+  int toggle = 0;
+  if (++toggle > 100) {
+    digitalWrite(LED_BUILTIN, LOW);  // turn the LED off by making the voltage LOW
+    if (toggle > 200) {
+      toggle = 0;
+    }
+
+  } else {
+    digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
+  }
 
 #if 0
   // MidiUSB.poll();
@@ -209,23 +238,22 @@ void loop() {
   }
 #endif
 
-  uint64_t keys;
+  uint16_t keys[4];
 
-  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
 
-  readManual(CHOIR, &keys); // 11 ms
+  readManual(CHOIR, keys);  // 11 ms
   UpadateKeyState(choirKeys, keys, numManualKeys, CHOIRMIDICHANNEL); //0.620 msZ
 
-  readManual(GREAT, &keys);
+  readManual(GREAT, keys);
   UpadateKeyState(greatKeys, keys, numManualKeys, GREATMIDICHANNEL);
 
-  digitalWrite(LED_BUILTIN, LOW);  // turn the LED off by making the voltage LOW
-
-  readManual(SWELL, &keys);
+  readManual(SWELL, keys);
   UpadateKeyState(swellKeys, keys, numManualKeys, SWELLMIDICHANNEL);
 
-  readManual(PEDAL | PISTON, &keys);
+  digitalWrite(PISTON, LOW);  // Digital write can only turn on one DIO at a time, so can not OR them. So do them one at a time!
+  readManual(PEDAL, keys);   // note: takes 1.36ms
+  digitalWrite(PISTON, HIGH);
   UpadateKeyState(pedalKeys, keys, numManualKeys, PEDALMIDICHANNEL);
 
-  //  delay(1000);                       // wait for a second
+  // delay(1000);  // wait for a second
 }
