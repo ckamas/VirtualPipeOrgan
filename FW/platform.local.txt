@@ -1,0 +1,2 @@
+recipe.hooks.sketch.prebuild.1.pattern=/home/ckamas/bin/make-git-version.sh "{build.source.path}" "{build.path}"
+

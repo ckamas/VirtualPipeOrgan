@@ -2,6 +2,7 @@
 #include <MCP23017.h>
 #include <MIDIUSB.h>
 #include <assert.h>
+#include "git-version.h"
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -9,14 +10,14 @@
 
 // handle diagnostic informations given by assertion and abort program execution:
 void __assert(const char *__func, const char *__file, int __lineno, const char *__sexp) {
-    // transmit diagnostic informations through serial link. 
-    Serial.println(__func);
-    Serial.println(__file);
-    Serial.println(__lineno, DEC);
-    Serial.println(__sexp);
-    Serial.flush();
-    // abort program execution.
-    abort();
+  // transmit diagnostic informations through serial link.
+  Serial.println(__func);
+  Serial.println(__file);
+  Serial.println(__lineno, DEC);
+  Serial.println(__sexp);
+  Serial.flush();
+  // abort program execution.
+  abort();
 }
 
 MCP23017 A = MCP23017(0x23);
@@ -76,11 +77,13 @@ void setup() {
   while (!Serial) {};
 
   // print out the time stamp to act as a version
-  Serial.print ("Version 1.0 Compiled ");
-  Serial.print (__DATE__);
-  Serial.print (" ");
-  Serial.print (__TIME__);
-  Serial.println();
+  Serial.println("Version 1.0");
+  Serial.print("Compiled " __DATE__);
+  Serial.print(" ");
+  Serial.println(__TIME__);
+  Serial.print("Git Tag:");
+  Serial.println(GIT_VERSION);
+
 
   // Serial.println("Hello World");
 
@@ -188,10 +191,10 @@ void UpadateKeyState(struct keyState *keysState, uint16_t keys[4], int length, i
   // dumpKeyState(keysState);
   for (int i = 0; i < length; i++) {
     uint16_t state = 0;
-    uint16_t index=i/16;
-    uint16_t shift=i%16;
-    assert (index<4); // make sure maths is right. keys[4] can only be 0,1,2,3!
-    assert (shift<16);
+    uint16_t index = i / 16;
+    uint16_t shift = i % 16;
+    assert(index < 4);  // make sure maths is right. keys[4] can only be 0,1,2,3!
+    assert(shift < 16);
 
     state = (keys[index] >> shift) & 0x01;
 
@@ -264,8 +267,8 @@ void loop() {
   uint16_t keys[4];
 
 
-  readManual(CHOIR, keys);  // 11 ms
-  UpadateKeyState(choirKeys, keys, numManualKeys, CHOIRMIDICHANNEL); //0.620 msZ
+  readManual(CHOIR, keys);                                            // 11 ms
+  UpadateKeyState(choirKeys, keys, numManualKeys, CHOIRMIDICHANNEL);  //0.620 msZ
 
   readManual(GREAT, keys);
   UpadateKeyState(greatKeys, keys, numManualKeys, GREATMIDICHANNEL);
@@ -274,7 +277,7 @@ void loop() {
   UpadateKeyState(swellKeys, keys, numManualKeys, SWELLMIDICHANNEL);
 
   digitalWrite(PISTON, LOW);  // Digital write can only turn on one DIO at a time, so can not OR them. So do them one at a time!
-  readManual(PEDAL, keys);   // note: takes 1.36ms
+  readManual(PEDAL, keys);    // note: takes 1.36ms
   digitalWrite(PISTON, HIGH);
   UpadateKeyState(pedalKeys, keys, numManualKeys, PEDALMIDICHANNEL);
 
