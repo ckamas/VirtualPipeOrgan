@@ -1,11 +1,23 @@
 #include <Arduino.h>
 #include <MCP23017.h>
 #include <MIDIUSB.h>
+#include <assert.h>
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 #define AT __FILE__ ":" TOSTRING(__LINE__)
 
+// handle diagnostic informations given by assertion and abort program execution:
+void __assert(const char *__func, const char *__file, int __lineno, const char *__sexp) {
+    // transmit diagnostic informations through serial link. 
+    Serial.println(__func);
+    Serial.println(__file);
+    Serial.println(__lineno, DEC);
+    Serial.println(__sexp);
+    Serial.flush();
+    // abort program execution.
+    abort();
+}
 
 MCP23017 A = MCP23017(0x23);
 MCP23017 B = MCP23017(0x25);
@@ -62,6 +74,14 @@ void setup() {
   Wire.setClock(400000L);
   Serial.begin(115200);
   while (!Serial) {};
+
+  // print out the time stamp to act as a version
+  Serial.print ("Version 1.0 Compiled ");
+  Serial.print (__DATE__);
+  Serial.print (" ");
+  Serial.print (__TIME__);
+  Serial.println();
+
   // Serial.println("Hello World");
 
   // initialize digital pin LED_BUILTIN as an output.
@@ -167,11 +187,14 @@ void UpadateKeyState(struct keyState *keysState, uint16_t keys[4], int length, i
   // Serial.println(TOSTRING(__LINE__));
   // dumpKeyState(keysState);
   for (int i = 0; i < length; i++) {
-    int state = 0;
-    int index=i/16;
-    int shift=i%16;
+    uint16_t state = 0;
+    uint16_t index=i/16;
+    uint16_t shift=i%16;
+    assert (index<4); // make sure maths is right. keys[4] can only be 0,1,2,3!
+    assert (shift<16);
 
     state = (keys[index] >> shift) & 0x01;
+
     // Serial.print ("i="); Serial.print(i);
     // Serial.print (" shift="); Serial.print(shift);
     // Serial.print (" index="); Serial.print(index);
