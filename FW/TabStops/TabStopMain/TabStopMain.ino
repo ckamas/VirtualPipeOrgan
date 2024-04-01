@@ -1,6 +1,8 @@
 #include <MIDIUSB.h>
 #include <Wire.h>
 
+#include "git-version.h"
+
 #include "TabStopDriver.h"
 #include "TabStopReader.h"
 #include "TabStopDataBase.h"
@@ -75,11 +77,13 @@ void setup() {
   while (!Serial) {};
 
   // print out the time stamp to act as a version
-  Serial.print ("Version 1.0 Compiled ");
-  Serial.print (__DATE__);
-  Serial.print (" ");
-  Serial.print (__TIME__);
-  Serial.println();
+  Serial.println("Version 1.0");
+  Serial.print("Compiled " __DATE__);
+  Serial.print(" ");
+  Serial.println(__TIME__);
+  Serial.print("Git Tag:");
+  Serial.println(GIT_VERSION);
+
   
   Wire.begin();
 
