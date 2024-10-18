@@ -10,10 +10,9 @@
 #include "TabStopDriverClass.hpp"
 #include "TabStopReaderClass.hpp"
 
-#pragma GCC optimize("-O0")
+//#pragma GCC optimize("-O0")
 
 TabStopsEngine MyEngine;
-int drive = 0;
 unsigned long timeout;
 
 TabStopsReadingEngine MyTabReader;
@@ -76,6 +75,8 @@ void setup() {
   Serial.begin(115200);
   while (!Serial) {};
 
+  delayMicroseconds(1000000);
+
   // print out the time stamp to act as a version
   Serial.println("Version 1.0");
   Serial.print("Compiled " __DATE__);
@@ -84,7 +85,7 @@ void setup() {
   Serial.print("Git Tag:");
   Serial.println(GIT_VERSION);
 
-  
+
   Wire.begin();
 
   setupTabStopDriver();
@@ -102,48 +103,80 @@ void setup() {
 }
 
 
+// define to test setting the tab stops
+// #define TESTWRITE
 
-void loop() {
-  if (millis() - timeout >= 250) {
-    timeout = millis();
+// define for reading the state of the tab stops
+// #define TESTREAD
+
+void flashLed() {
+  static bool toggle = false;
+  timeout = millis();
+  if (true == toggle) {
+    // Serial.println("low");
     digitalWrite(LED_BUILTIN, LOW);
+    toggle = false;
+  } else {
+    // Serial.println("high");
+    digitalWrite(LED_BUILTIN, HIGH);
+    toggle = true;
   }
+  //Serial.println("loop");
+}
+void loop() {
+  // main loop code
+  if (millis() - timeout >= 1000) {
+    flashLed();
+  }
+
+#if !defined(TESTREAD) && !defined(TESTWRITE)
   MidiCheckControl();
+#endif
   MyEngine.loop();
   MyTabReader.loop();
+
+// code to test setting the tab stops
+#ifdef TESTWRITE
+  static int drive = 0;
+  if (millis() - timeout >= 250) {
+    MyEngine.tabOn(drive);
+    drive++;
+    if (stops[drive].I2C_BIT == -1 && stops[drive].SPIaddress == -1) {
+      drive = 0;
+      flashLed();
+    }
+    MyEngine.tabOff(drive);
+    scanTabsPrintCode();
+    Serial.print("D=");
+    Serial.print(drive);
+    Serial.println(".");
+  }
+#endif
+// }
+
+// test code for reading the state of the tab stops
+#if TESTREAD
+  int mux = 7;
+  bool printed = false;
+  for (int chip = 0; chip < 7; chip++) {
+    for (int bit = 0; bit < 8; bit++) {
+      int address = mux << 6 | chip << 3 | bit;
+      // address=0x1c8;
+      if (isTabSet(address) == 1) {
+        printed = true;
+        Serial.print(stops[address].SPIaddress);
+        Serial.print(" 0x");
+        Serial.print(address, HEX);
+        Serial.print(" ");
+        Serial.print(stops[address].TabStop);
+        Serial.print(" ");
+      }
+    }
+  }
+  if (printed) {
+    Serial.println();
+    printed = false;
+  }
+  flashLed();
+#endif  // TESTREAD
 }
-
-// if (millis() - timeout >= 250) {
-//   timeout = millis();
-//   MyEngine.tabOn(drive);
-//   drive++;
-//   if (stops[drive].I2C_BIT == -1 && stops[drive].SPIaddress == -1) {
-//     drive = 0;
-//   }
-//   MyEngine.tabOff(drive);
-//   // scanTabsPrintCode();
-//   // Serial.println(".");
-// }
-
-
-// int mux = 7;
-// bool printed = false;
-// for (int chip = 0; chip < 7; chip++) {
-//   for (int bit = 0; bit < 8; bit++) {
-//     int address = mux << 6 | chip << 3 | bit;
-//     // address=0x1c8;
-//     if (isTabSet(address) == 1) {
-//       printed = true;
-//       Serial.print(stops[i].SPIaddress);
-//       Serial.print(" 0x");
-//       Serial.print(address, HEX);
-//       Serial.print(" ");
-//       Serial.print(stops[i].TabStop);
-//       Serial.print(" ");
-//     }
-//   }
-// }
-// if (printed) {
-//   Serial.println();
-//   printed = false;
-// }

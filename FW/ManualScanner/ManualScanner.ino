@@ -4,6 +4,19 @@
 #include <assert.h>
 #include "git-version.h"
 
+// keyboard mappings
+// Arduino Leonardo:0
+// bottom keyboard lowest ch4 note 84
+// bottom keyboard highest ch4 note 48
+// middle Great keyboard lowest ch3 note 84
+// middle great keyboard highest ch3 note 48
+// top Swell keyboard lowest ch2 note 84
+// top swell keyboard highest ch2 note 48
+// peadle lowest note ch5 note 59
+// peadle lowest note ch5 note 60
+
+
+
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 #define AT __FILE__ ":" TOSTRING(__LINE__)
@@ -48,7 +61,7 @@ struct keyState {
 
 const int numManualKeys = 61;
 //const int numManualKeys = 1;
-const int numPedalKeys = 32;
+//const int numPedalKeys = 32;
 const int lowestManualNoteMIDI = 36;
 const int lowestPedalNoteMIDI = 12;  // I think 24 is CC not CCC... might need to be 12 notes lower, or 12 for CCC!
 
@@ -127,7 +140,8 @@ void setup() {
   initKeyState(choirKeys, numManualKeys, lowestManualNoteMIDI);
   initKeyState(greatKeys, numManualKeys, lowestManualNoteMIDI);
   initKeyState(swellKeys, numManualKeys, lowestManualNoteMIDI);
-  initKeyState(pedalKeys, numManualKeys, lowestPedalNoteMIDI);
+//  initKeyState(pedalKeys, numManualKeys, lowestPedalNoteMIDI);
+  initKeyState(pedalKeys, numManualKeys, lowestManualNoteMIDI);
   //  Serial.println(TOSTRING(__LINE__));
 }
 
@@ -216,8 +230,8 @@ void UpadateKeyState(struct keyState *keysState, uint16_t keys[4], int length, i
         // Serial.print(" key#=");
         // Serial.print(keysState[i].midiKey);
         // Serial.println();
-        //        Serial.print(TOSTRING(__LINE__));
-        //        dumpKeyState(keysState);
+        // Serial.print(TOSTRING(__LINE__));
+        // dumpKeyState(keysState);
       }
     } else {
       if (DOWN == keysState[i].oldState)  // old was downn, now up
@@ -276,10 +290,20 @@ void loop() {
   readManual(SWELL, keys);
   UpadateKeyState(swellKeys, keys, numManualKeys, SWELLMIDICHANNEL);
 
-  digitalWrite(PISTON, LOW);  // Digital write can only turn on one DIO at a time, so can not OR them. So do them one at a time!
+  digitalWrite(PISTON, LOW);  // Digital write can only turn on one DIO at a time, so can not OR them. So do them one here and one in the readManual func
   readManual(PEDAL, keys);    // note: takes 1.36ms
   digitalWrite(PISTON, HIGH);
   UpadateKeyState(pedalKeys, keys, numManualKeys, PEDALMIDICHANNEL);
+  // for (int i=0;i<4;i++)
+  // {
+  //   if (keys[i]<16) {
+  //     Serial.print("0");
+  //   }
+  //   Serial.print(keys[i],HEX);
+  // }
+  // Serial.println();
+
+
 
   // delay(1000);  // wait for a second
 }

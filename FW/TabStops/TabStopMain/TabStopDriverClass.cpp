@@ -4,7 +4,7 @@
 #include "TabStopReader.h"
 #include "TabStopDriver.h"
 
-#pragma GCC optimize("-O0")
+//#pragma GCC optimize("-O0")
 
 
 // TabStopsEngine all drivers off, leave in their current position.

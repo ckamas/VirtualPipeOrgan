@@ -4,7 +4,7 @@
 #include <SparkFun_I2C_Mux_Arduino_Library.h>  //Click here to get the library: http://librarymanager/All#SparkFun_I2C_Mux
 #include <MIDIUSB.h>
 
-#pragma GCC optimize("-O0")
+//#pragma GCC optimize("-O0")
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)

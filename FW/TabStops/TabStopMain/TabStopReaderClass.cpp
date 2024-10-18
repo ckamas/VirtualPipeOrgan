@@ -8,7 +8,7 @@
 #include "TabStopReaderClass.hpp"
 #include "TabStopReader.h"
 
-#pragma GCC optimize("-O0")
+//#pragma GCC optimize("-O0")
 
 
 void TabStopsReadingEngine::MidiSendTabOn(uint8_t tab) {
@@ -90,7 +90,7 @@ void TabStopsReadingEngine::loop() {
     uint8_t chip = myDatabase[i].chip;
     uint8_t x = readPCF8574(mux, chip);
 
-    // //debug
+    //debug
     // if (x != myDatabase[i].value) {
     //   Serial.print("Mux=");
     //   Serial.print(mux);
@@ -100,7 +100,8 @@ void TabStopsReadingEngine::loop() {
     //   Serial.print(x, HEX);
     //   Serial.print(" value=0x");
     //   Serial.println(myDatabase[i].value, HEX);
-    // }  //~debug
+    // }  
+    //~debug
 
     myDatabase[i].value = x;
   }
@@ -140,9 +141,9 @@ void TabStopsReadingEngine::loop() {
             // now check the time out for reset
             if (stops[stops_i].ReadTimeStamp == 0) {
               stops[stops_i].ReadTimeStamp = millis();
-              if (stops[stops_i].ReadTimeStamp == 0) {
-                stops[stops_i].ReadTimeStamp = 1;
-              }
+              // if (stops[stops_i].ReadTimeStamp == 0) {
+              //   stops[stops_i].ReadTimeStamp = 1;
+              // }
               MidiSendTabOn(stops_i);  // 1st time we have a new value, let the midi know
               stops[stops_i].tabReadSet = true;
               // TabStopsReadingEngineDebug();
@@ -153,9 +154,9 @@ void TabStopsReadingEngine::loop() {
             // now check the time out for reset
             if (stops[stops_i].ReadTimeStamp == 0) {
               stops[stops_i].ReadTimeStamp = millis();
-              if (stops[stops_i].ReadTimeStamp == 0) {
-                stops[stops_i].ReadTimeStamp = 1;
-              }
+              // if (stops[stops_i].ReadTimeStamp == 0) {
+              //   stops[stops_i].ReadTimeStamp = 1;
+              // }
               MidiSendTabOff(stops_i);  // 1st time we have a new value, let the midi know
               stops[stops_i].tabReadSet = false;
               // TabStopsReadingEngineDebug();
