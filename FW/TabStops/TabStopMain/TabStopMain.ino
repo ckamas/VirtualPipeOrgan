@@ -133,7 +133,7 @@ void loop() {
   MidiCheckControl();
 #endif
   MyEngine.loop();
-  MyTabReader.loop();
+  MyTabReader.loop(); /// TODO this takes ~5ms to complete... needs its own state machine too?
 
 // code to test setting the tab stops
 #ifdef TESTWRITE
